@@ -1,0 +1,19 @@
+function [points] = getHarrisPoints(I, alpha, k)
+    I = im2double(rgb2gray(I));
+    filterx = [-1 0 1; -1 0 1; -1 0 1];
+    filtery = [-1 0 1; -1 0 1; -1 0 1]';
+%     filtery = fspecial('sobel');
+%     filterx = fspecial('sobel')';
+    Ix = imfilter(I, filterx, 'same');
+    Iy = imfilter(I, filtery, 'same');
+    w = ones(5,5);
+    Ix2 = imfilter(Ix.^2, w, 'same');
+    Iy2 = imfilter(Iy.^2, w, 'same');
+    Ixy = imfilter(Ix.*Iy, w, 'same');
+    R = (Ix2.*Iy2 - Ixy.^2) - k*(Ix2 + Iy2).^2;
+    [~, inds] = sort(R(:), 'descend');
+    inds = inds(1:alpha);
+    s = size(R);
+    [pointsx,pointsy] = ind2sub(s, inds);
+    points = [pointsy, pointsx];
+end
